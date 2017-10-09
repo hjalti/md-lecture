@@ -44,7 +44,7 @@ a group of lectures and initialize using
 mdl init
 ```
 
-This creates a directory `.template`, in the current directory, which contains
+This creates a directory `.lecture`, in the current directory, which contains
 the template used to generate PDF lectures from markdown files in all
 subdirectories of the current directory.
 

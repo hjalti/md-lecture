@@ -66,7 +66,8 @@ def init(args):
     if local.is_dir():
         print('Already initialized', file=sys.stderr)
     copytree(str(template_dir), str(local))
-    print('Already initialized')
+    print('Initialized lecture directory')
+    print(f"Template stored in '{local}'")
 
 def new(args):
     new_dir = root / args.name
