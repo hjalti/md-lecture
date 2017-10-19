@@ -8,7 +8,7 @@ with open('README.md') as f:
 
 setup(
     name='mdlecture',
-    version='0.0.3',
+    version='0.0.4',
     description='Generate PDF lecture slides from markdown',
     long_description=readme,
     url='https://github.com/hjalti/mdlecture/',
@@ -17,7 +17,7 @@ setup(
     license='MIT',
     packages=['mdlecture'],
     package_data={
-        'mdlecture' : ['template/*']
+        'mdlecture' : ['template/*', 'template/hooks/*']
     },
     install_requires=[
         'watchdog==0.8.3',
