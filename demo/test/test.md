@@ -24,6 +24,15 @@ def there_is_some():
         template()
 ```
 
+## Evaluate Python code
+
+```
+>>> 3 + 9
+>>> 2**15
+>>> val = 'Na'
+>>> 5 * val
+```
+
 
 ## And finally
 

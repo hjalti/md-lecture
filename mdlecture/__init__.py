@@ -3,6 +3,7 @@ import os
 import subprocess
 import sys
 import time
+import importlib
 
 from pathlib import Path
 from shutil import copytree, which
@@ -33,19 +34,23 @@ def _find_template_dir():
 def _pdf(f):
     return f.with_suffix('.pdf')
 
-def _make_file(target):
+def _make_file(target, args):
     tdir = _find_template_dir()
     template = tdir / 'template.tex'
     os.environ['TEXINPUTS'] = f":{tdir}"
-    subprocess.run([
+    command = [
         'pandoc',
         '-t', 'beamer',
         '-o', f'{_pdf(target)}',
         '-V', 'fontfamily=tgheros',
         '--listings',
         f'--template={template}',
-        f'{target}',
-    ])
+    ]
+    if args.post_hook:
+        print(args.post_hook.process(str(target)))
+        subprocess.run(command, input=args.post_hook.process(str(target)), encoding='utf-8')
+    else:
+        subprocess.run(command + [str(target)])
 
 def _find_file(args):
     if args.target and args.target.is_file():
@@ -82,7 +87,7 @@ def new(args):
 def make(args):
     target = _find_file(args)
     print(f"Making '{target}'...")
-    _make_file(target)
+    _make_file(target, args)
     print('Done')
 
 def watch(args):
@@ -90,14 +95,14 @@ def watch(args):
     print(f"Watching '{to_watch}'")
     print(f"Press Ctrl+C to stop")
     to_watch_name = str(to_watch)
-    _make_file(to_watch)
+    _make_file(to_watch, args)
 
     class Handler(FileSystemEventHandler):
         def on_modified(self, event):
             if event.event_type == 'modified':
                 if event.src_path == to_watch_name:
                     print('Change detected, building...')
-                    _make_file(to_watch)
+                    _make_file(to_watch, args)
                     print('Done')
 
     if args.pdf_viewer:
@@ -119,6 +124,14 @@ def _executable(f):
         raise argparse.ArgumentError(f"'{f}' is not an executable")
     return res
 
+def _hook(name):
+    tdir = _find_template_dir()
+    sys.path.append(str(tdir / 'hooks'))
+    try:
+        return importlib.import_module(name)
+    except:
+        raise argparse.ArgumentError(f"'{name}' is not a valid hook")
+
 def _file_or_dir(f):
     res = Path(f)
     if not res.exists():
@@ -131,11 +144,11 @@ def main():
     parser.set_defaults(func=lambda _: parser.print_help())
     subparsers = parser.add_subparsers()
 
-    parser_init = subparsers.add_parser('init', help='Initialize a directory for lectures. Creeates a template folder that is used for all slides generated in its subdirectories.')
+    parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creeates a template folder '
+                                                      'that is used for all slides generated in its subdirectories.'))
     parser_init.set_defaults(func=init)
 
     parser_make = subparsers.add_parser('make', help='Build a PDF lecture from a markdown file.')
-    parser_make.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None, help='If TARGET is a file, that file is built. If TARGET is a directory, it is searched for .md files and the first one is built. If TARGET is not specified, the current directory is searched for .md files and the first one found is built.')
     parser_make.set_defaults(func=make)
 
     parser_new = subparsers.add_parser('new', help='Create and initialize a new markdown file for a lecture.')
@@ -143,9 +156,18 @@ def main():
     parser_new.set_defaults(func=new)
 
     parser_watch = subparsers.add_parser('watch', help='Monitor a markdown file and build a PDF lecture when it changes.')
-    parser_watch.add_argument('-v', '--pdf-viewer', metavar='VIEWER', type=_executable, default=None, help='If specified, opens the built PDF file in the viewer when started.')
-    parser_watch.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None,help='If TARGET is a file, that file is built. If TARGET is a directory, it is searched for .md files and the first one is built. If TARGET is not specified, the current directory is searched for .md files and the first one found is built.')
     parser_watch.set_defaults(func=watch)
+
+    for p in [parser_watch, parser_make]:
+        p.add_argument('-v', '--pdf-viewer', metavar='VIEWER', type=_executable, default=None, help='If specified, opens the built PDF file in the viewer when started.')
+        p.add_argument('-p', '--post-hook', metavar='HOOK', type=_hook, default=None, help=('Apply the specified hook to the input file before running the markdown file '
+                                                                                            'through pandoc. The hook should ouput the processed file to the standard output.'))
+        p.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None,help=('If TARGET is a file, that file is built. If TARGET is '
+                                                                                                    'a directory, it is searched for .md files and the first '
+                                                                                                    'one is built. If TARGET is not specified, the current '
+                                                                                                    'directory is searched for .md files and the first one '
+                                                                                                    'found is built.'))
+
 
     args = parser.parse_args()
     args.func(args)

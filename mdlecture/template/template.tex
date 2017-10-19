@@ -195,7 +195,7 @@ $endif$
 \setlength{\parskip}{6pt plus 2pt minus 1pt}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+  \setlength{\itemsep}{2pt}\setlength{\parskip}{0pt}}
 $if(numbersections)$
 \setcounter{secnumdepth}{$if(secnumdepth)$$secnumdepth$$else$5$endif$}
 $else$
@@ -244,7 +244,7 @@ $endif$
   \setbeamercolor{date}{fg=beamer@gray}
   \setbeamerfont{date}{size=\scriptsize,parent=structure}
   \setbeamerfont{title}{series=\bfseries,parent=structure}
-  %\setbeamerfont{block title}{series=\bfseries,parent=structure}
+  \setbeamerfont{block title}{series=\bfseries,parent=structure}
   \setbeamerfont{subtitle}{series=\normalfont,parent=structure}
   \setbeamerfont{author}{size=\small,parent=structure}
 }

@@ -71,3 +71,19 @@ mdl watch
 ```
 
 which runs a daemon that rebuilds the markdown file each time it changes.
+
+
+Advanced usage
+--------------
+
+With the `make` and `watch` commands, you can add the option `-p` (or
+`--post-hook`) to run the input file through a python script before being
+handed over to pandoc. The argument specified should be the name of a python
+module which should contain the function `process` which takes a single
+argument, the path to the target file. The function returns a string containing
+the markdown that will be piped to pandoc to produce the slides.
+
+Hooks should be added to the hooks directory in the template directory. As an
+example a hook called pyeval is provided, which evaluates all lines starting
+with `>>>` in the document and outputs the result of the evaluation in the
+following line.

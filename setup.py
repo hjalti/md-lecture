@@ -8,7 +8,7 @@ with open('README.md') as f:
 
 setup(
     name='mdlecture',
-    version='0.0.2',
+    version='0.0.3',
     description='Generate PDF lecture slides from markdown',
     long_description=readme,
     url='https://github.com/hjalti/mdlecture/',
