@@ -47,7 +47,6 @@ def _make_file(target, args):
         f'--template={template}',
     ]
     if args.post_hook:
-        print(args.post_hook.process(str(target)))
         subprocess.run(command, input=args.post_hook.process(str(target)), encoding='utf-8')
     else:
         subprocess.run(command + [str(target)])
