@@ -23,6 +23,7 @@ date: [Date]
 ---
 '''
 
+
 def _find_template_dir():
     p = root
     while p != p.parent:
@@ -31,8 +32,10 @@ def _find_template_dir():
             return lec
         p = p.parent
 
+
 def _pdf(f):
     return f.with_suffix('.pdf')
+
 
 def _make_file(target, args):
     tdir = _find_template_dir()
@@ -51,6 +54,7 @@ def _make_file(target, args):
     else:
         subprocess.run(command + [str(target)])
 
+
 def _find_file(args):
     if args.target and args.target.is_file():
         return args.target
@@ -65,6 +69,7 @@ def _find_file(args):
             sys.exit(1)
         return res[0]
 
+
 def init(args):
     local = root / '.lecture'
     if local.is_dir():
@@ -72,6 +77,7 @@ def init(args):
     copytree(str(template_dir), str(local))
     print('Initialized lecture directory')
     print(f"Template stored in '{local}'")
+
 
 def new(args):
     new_dir = root / args.name
@@ -88,6 +94,7 @@ def make(args):
     print(f"Making '{target}'...")
     _make_file(target, args)
     print('Done')
+
 
 def watch(args):
     to_watch = _find_file(args)
@@ -117,19 +124,22 @@ def watch(args):
     observer.join()
     print('Exiting')
 
+
 def _executable(f):
     res = which(f)
     if not res:
         raise argparse.ArgumentError(f"'{f}' is not an executable")
     return res
 
+
 def _hook(name):
     tdir = _find_template_dir()
     sys.path.append(str(tdir / 'hooks'))
     try:
         return importlib.import_module(name)
-    except:
+    except ...:
         raise argparse.ArgumentError(f"'{name}' is not a valid hook")
+
 
 def _file_or_dir(f):
     res = Path(f)
@@ -137,14 +147,15 @@ def _file_or_dir(f):
         raise argparse.ArgumentError(f"'{f}' is not a file or directory")
     return res.resolve()
 
+
 def main():
     # create the top-level parser
     parser = argparse.ArgumentParser(description='Create PDF lecture slides from markdown files.')
     parser.set_defaults(func=lambda _: parser.print_help())
     subparsers = parser.add_subparsers()
 
-    parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creeates a template folder '
-                                                      'that is used for all slides generated in its subdirectories.'))
+    parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creeates a template folder'
+                                                      ' that is used for all slides generated in its subdirectories.'))
     parser_init.set_defaults(func=init)
 
     parser_make = subparsers.add_parser('make', help='Build a PDF lecture from a markdown file.')
@@ -154,19 +165,22 @@ def main():
     parser_new.add_argument('name', metavar='NAME')
     parser_new.set_defaults(func=new)
 
-    parser_watch = subparsers.add_parser('watch', help='Monitor a markdown file and build a PDF lecture when it changes.')
+    parser_watch = subparsers.add_parser('watch',
+                                         help='Monitor a markdown file and build a PDF lecture when it changes.')
     parser_watch.set_defaults(func=watch)
 
     for p in [parser_watch, parser_make]:
-        p.add_argument('-v', '--pdf-viewer', metavar='VIEWER', type=_executable, default=None, help='If specified, opens the built PDF file in the viewer when started.')
-        p.add_argument('-p', '--post-hook', metavar='HOOK', type=_hook, default=None, help=('Apply the specified hook to the input file before running the markdown file '
-                                                                                            'through pandoc. The hook should ouput the processed file to the standard output.'))
-        p.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None,help=('If TARGET is a file, that file is built. If TARGET is '
-                                                                                                    'a directory, it is searched for .md files and the first '
-                                                                                                    'one is built. If TARGET is not specified, the current '
-                                                                                                    'directory is searched for .md files and the first one '
-                                                                                                    'found is built.'))
-
+        p.add_argument('-v', '--pdf-viewer', metavar='VIEWER', type=_executable, default=None,
+                       help='If specified, opens the built PDF file in the viewer when started.')
+        p.add_argument('-p', '--post-hook', metavar='HOOK', type=_hook, default=None,
+                       help=('Apply the specified hook to the input file before running the markdown file '
+                             'through pandoc. The hook should ouput the processed file to the standard output.'))
+        p.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None,
+                       help=('If TARGET is a file, that file is built. If TARGET is '
+                             'a directory, it is searched for .md files and the first '
+                             'one is built. If TARGET is not specified, the current '
+                             'directory is searched for .md files and the first one '
+                             'found is built.'))
 
     args = parser.parse_args()
     args.func(args)
@@ -174,4 +188,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
