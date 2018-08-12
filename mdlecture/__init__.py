@@ -38,6 +38,10 @@ def _pdf(f):
 
 
 def _make_file(target, args):
+    if subprocess.run(['which', 'pandoc']).returncode:
+        print(f"Pandoc is not installed.", file=sys.stderr)
+        sys.exit(1)
+
     tdir = _find_template_dir()
     template = tdir / 'template.tex'
     os.environ['TEXINPUTS'] = f":{tdir}"
