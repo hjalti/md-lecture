@@ -13,7 +13,7 @@ from watchdog.events import FileSystemEventHandler
 
 root = Path('.').resolve()
 script_dir = Path(__file__).resolve().parent
-template_dir = script_dir / 'template'
+default_template_dir = script_dir / 'template'
 
 TEMPLATE = '''---
 title: [Title]
@@ -75,10 +75,12 @@ def _find_file(args):
 
 
 def init(args):
+    template_dir = vars(args)['template'] if vars(args)['template'] else default_template_dir
     local = root / '.lecture'
     if local.is_dir():
         print('Already initialized', file=sys.stderr)
-    copytree(str(template_dir), str(local))
+        sys.exit(1)
+    copytree(str(os.path.abspath(template_dir)), str(local))
     print('Initialized lecture directory')
     print(f"Template stored in '{local}'")
 
@@ -87,7 +89,7 @@ def new(args):
     new_dir = root / args.name
     if new_dir.exists():
         print(f"File or directory '{args.name}' already exists")
-        return
+        sys.exit(1)
     new_dir.mkdir()
     lecture_file = new_dir / f'{args.name}.md'
     lecture_file.write_text(TEMPLATE)
@@ -160,6 +162,7 @@ def main():
 
     parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creeates a template folder'
                                                       ' that is used for all slides generated in its subdirectories.'))
+    parser_init.add_argument('--template', type=str, help='set user-defined template root')
     parser_init.set_defaults(func=init)
 
     parser_make = subparsers.add_parser('make', help='Build a PDF lecture from a markdown file.')
