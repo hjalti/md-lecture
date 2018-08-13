@@ -160,7 +160,7 @@ def main():
     parser.set_defaults(func=lambda _: parser.print_help())
     subparsers = parser.add_subparsers()
 
-    parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creeates a template folder'
+    parser_init = subparsers.add_parser('init', help=('Initialize a directory for lectures. Creates a template folder'
                                                       ' that is used for all slides generated in its subdirectories.'))
     parser_init.add_argument('--template', type=str, help='set user-defined template root')
     parser_init.set_defaults(func=init)
@@ -181,7 +181,7 @@ def main():
                        help='If specified, opens the built PDF file in the viewer when started.')
         p.add_argument('-p', '--post-hook', metavar='HOOK', type=_hook, default=None,
                        help=('Apply the specified hook to the input file before running the markdown file '
-                             'through pandoc. The hook should ouput the processed file to the standard output.'))
+                             'through pandoc. The hook should output the processed file to the standard output.'))
         p.add_argument('target', metavar='TARGET', nargs='?', type=_file_or_dir, default=None,
                        help=('If TARGET is a file, that file is built. If TARGET is '
                              'a directory, it is searched for .md files and the first '
