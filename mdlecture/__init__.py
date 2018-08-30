@@ -143,7 +143,7 @@ def _hook(name):
     sys.path.append(str(tdir / 'hooks'))
     try:
         return importlib.import_module(name)
-    except ...:
+    except Exception:
         raise argparse.ArgumentError(f"'{name}' is not a valid hook")
 
 
