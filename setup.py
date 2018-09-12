@@ -17,7 +17,7 @@ setup(
     license='MIT',
     packages=['mdlecture'],
     package_data={
-        'mdlecture' : ['template/*', 'template/hooks/*']
+        'mdlecture': ['template/*', 'template/hooks/*']
     },
     install_requires=[
         'watchdog==0.8.3',

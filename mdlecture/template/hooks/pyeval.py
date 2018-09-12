@@ -4,6 +4,7 @@ import contextlib
 
 context = {}
 
+
 def do_eval(s):
     try:
         return repr(eval(s, context))
@@ -25,4 +26,3 @@ def process(src):
                     if val:
                         print(val)
         return out.getvalue()
-
